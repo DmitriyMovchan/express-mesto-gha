@@ -23,7 +23,7 @@ const createUser = (req, res) => {
     return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
   }
   user.create({ name, about, avatar })
-    .then(user => {
+    .then(() => {
       res.status(201).send({ message: 'User has been created' });
     })
     .catch(err => {
