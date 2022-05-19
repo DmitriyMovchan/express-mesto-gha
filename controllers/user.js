@@ -27,7 +27,7 @@ const createUser = (req, res) => {
       res.status(201).send({ message: 'User has been created' });
     })
     .catch(err => {
-      res.status(500).send({ message: 'Server error' });
+      res.status(500).send({ name, about, avatar });
     });
 };
 
