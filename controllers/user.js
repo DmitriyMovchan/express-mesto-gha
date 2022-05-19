@@ -24,10 +24,10 @@ const createUser = (req, res) => {
   }
   user.create({ name, about, avatar })
     .then(() => {
-      res.status(201).send({ message: 'User has been created' });
+      res.status(201).send({ name, about, avatar });
     })
     .catch(err => {
-      res.status(500).send({ name, about, avatar });
+      res.status(500).send({ message: 'Server error' });
     });
 };
 
