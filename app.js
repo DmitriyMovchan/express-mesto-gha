@@ -1,9 +1,7 @@
 const express = require('express');
-const fs = require('fs').promises;
-const path = require('path');
 const mongoose = require('mongoose');
-const users = require('./data.json');
 const { userRouter } = require('./routes/user');
+const { cardRouter } = require('./routes/card');
 
 const app = express();
 
@@ -14,12 +12,10 @@ app.use((req, _, next) => {
   req.user = {
     _id: '6285ffb56466a33763982e46',
   };
-
-  console.log(req.user);
-
   next();
 });
 app.use('/', userRouter);
+app.use('/cards', cardRouter);
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
