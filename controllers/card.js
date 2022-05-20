@@ -39,9 +39,16 @@ const deleteCard = (req, res) => {
         return res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
       }
       res.send({ message: 'Карточка удалена' })
-        .catch(() => {
+        // eslint-disable-next-line consistent-return
+        .catch((err) => {
+          if (err.name === 'ValidationError') {
+            return res.status(400).send({ message: 'Переданы некорректные данные при удалении карточки' });
+          }
           res.status(400).send({ message: 'некорректный id карточки.' });
         });
+    })
+    .catch((err) => {
+      res.status(500).send({ message: err.message });
     });
 };
 
