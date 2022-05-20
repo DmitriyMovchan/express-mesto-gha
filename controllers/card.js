@@ -48,7 +48,7 @@ const deleteCard = (req, res) => {
         });
     })
     .catch((err) => {
-      res.status(500).send({ message: err.message });
+      res.status(400).send({ message: err.message });
     });
 };
 
@@ -71,7 +71,7 @@ const deleteLike = (req, res) => {
     // eslint-disable-next-line consistent-return
     .then((card) => {
       if (!card) {
-        return res.status(400).send({ message: 'некорректный id карточки' });
+        return res.status(404).send({ message: 'некорректный id карточки' });
       }
       res.status(200).send({ message: card });
     })
