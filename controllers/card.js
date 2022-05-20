@@ -43,8 +43,12 @@ const deleteCard = (req, res) => {
 
 const putLike = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
+    // eslint-disable-next-line consistent-return
     .then((card) => {
       console.log(card);
+      if (!card) {
+        return res.status(404).send({ message: 'пользователь не найден.' });
+      }
       res.status(200).send({ message: card });
     })
     .catch(() => {
