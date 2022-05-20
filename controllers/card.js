@@ -56,7 +56,11 @@ const deleteLike = (req, res) => {
     .then((card) => {
       res.status(200).send({ message: card });
     })
-    .catch(() => {
+    // eslint-disable-next-line consistent-return
+    .catch((err) => {
+      if (err.kind === 'ObjectId') {
+        return res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
+      }
       res.send({ message: 'лайк удален' });
     });
 };
