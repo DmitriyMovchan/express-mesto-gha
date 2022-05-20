@@ -44,10 +44,11 @@ const deleteCard = (req, res) => {
 const putLike = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
     .then((card) => {
+      console.log(card);
       res.status(200).send({ message: card });
     })
     .catch(() => {
-      res.send({ message: 'лайк поставлен' });
+      res.status(400).send({ message: 'некорректный id карточки' });
     });
 };
 
@@ -55,17 +56,15 @@ const deleteLike = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } })
     // eslint-disable-next-line consistent-return
     .then((card) => {
+      console.log(card);
       if (!req.params.cardId) {
         return res.status(400).send({ message: 'некорректный id карточки' });
       }
       res.status(200).send({ message: card });
     })
     // eslint-disable-next-line consistent-return
-    .catch((err) => {
-      if (err.kind === 'ObjectId') {
-        return res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
-      }
-      res.send({ message: 'лайк удален' });
+    .catch(() => {
+      res.status(400).send({ message: 'некорректный id карточки' });
     });
 };
 
