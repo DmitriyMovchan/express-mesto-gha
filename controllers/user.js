@@ -53,7 +53,7 @@ const updateProfile = (req, res) => {
   if (!name || !about) {
     return res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
   }
-  User.findByIdAndUpdate(req.user._id, { name, about })
+  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then(() => res.status(200).send({ message: name, about }))
     .catch((err) => {
       if (err.kind === 'ObjectId') {
@@ -69,8 +69,8 @@ const updateAvatar = (req, res) => {
   if (!avatar) {
     return res.status(400).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
   }
-  User.findByIdAndUpdate(req.user._id, { avatar })
-    .then(() => res.status(200).send({ message: avatar }))
+  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
+    .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.kind === 'ObjectId') {
         return res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
