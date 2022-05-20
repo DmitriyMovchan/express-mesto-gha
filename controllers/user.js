@@ -1,32 +1,35 @@
-const user = require('../models/user');
+const User = require('../models/user');
 
 const getUser = (req, res) => {
   const { id } = req.params;
-  user.findById(id)
+  User.findById(id)
+    // eslint-disable-next-line consistent-return
     .then((user) => {
       if (!user) {
         return res.status(404).send({ message: 'пользователь не найден.' });
       }
-      res.status(200).send(user);
+      res.status(200).send({ message: user });
     })
     .catch((err) => {
       if (err.kind === 'ObjectId') {
-        return res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
+        return res.status(400).send({ message: 'Пользователь по указанному _id не найден.' });
       }
       return res.status(500).send({ message: 'Server error' });
     });
 };
 
+// eslint-disable-next-line consistent-return
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   if (!name || !about || !avatar) {
     return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
   }
-  user.create({ name, about, avatar })
-    .then(() => {
-      res.status(201).send({ message: { name, about, avatar } });
+  User.create({ name, about, avatar })
+    .then((user) => {
+      res.status(201).send({ message: user });
     })
-    .catch(err => {
+    // eslint-disable-next-line consistent-return
+    .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
       }
@@ -35,22 +38,23 @@ const createUser = (req, res) => {
 };
 
 const getUsers = (req, res) => {
-  user.find({})
-    .then(users => {
+  User.find({})
+    .then((users) => {
       res.status(200).send(users);
     })
-    .catch(err => {
+    .catch(() => {
       res.status(500).send({ message: 'Server error' });
     });
 };
 
+// eslint-disable-next-line consistent-return
 const updateProfile = (req, res) => {
   const { name, about } = req.body;
   if (!name || !about) {
     return res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
   }
-  user.findByIdAndUpdate(req.user._id, { name, about })
-    .then(user => res.status(200).send({ message: 'Информация успешно обновлена' }))
+  User.findByIdAndUpdate(req.user._id, { name, about })
+    .then((user) => res.status(200).send({ message: user }))
     .catch((err) => {
       if (err.kind === 'ObjectId') {
         return res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
@@ -59,13 +63,14 @@ const updateProfile = (req, res) => {
     });
 };
 
+// eslint-disable-next-line consistent-return
 const updateAvatar = (req, res) => {
   const { avatar } = req.body;
   if (!avatar) {
     return res.status(400).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
   }
-  user.findByIdAndUpdate(req.user._id, { avatar })
-    .then(user => res.status(200).send({ message: 'Аватар успешно обновлен' }))
+  User.findByIdAndUpdate(req.user._id, { avatar })
+    .then((user) => res.status(200).send({ message: user.avatar }))
     .catch((err) => {
       if (err.kind === 'ObjectId') {
         return res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
