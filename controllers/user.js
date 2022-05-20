@@ -54,7 +54,7 @@ const updateProfile = (req, res) => {
     return res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
   }
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
-    .then(() => res.status(200).send({ message: name, about }))
+    .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.kind === 'ObjectId') {
         return res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });

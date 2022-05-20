@@ -53,7 +53,11 @@ const putLike = (req, res) => {
 
 const deleteLike = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } })
+    // eslint-disable-next-line consistent-return
     .then((card) => {
+      if (!req.params.cardId) {
+        return res.status(400).send({ message: 'некорректный id карточки' });
+      }
       res.status(200).send({ message: card });
     })
     // eslint-disable-next-line consistent-return
