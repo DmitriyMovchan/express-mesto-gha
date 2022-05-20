@@ -33,11 +33,15 @@ const createCard = (req, res) => {
 
 const deleteCard = (req, res) => {
   Card.findByIdAndDelete(req.params.cardId)
+    // eslint-disable-next-line consistent-return
     .then((card) => {
       if (!card) {
         return res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
       }
-      return res.send({ message: 'Карточка удалена' });
+      res.send({ message: 'Карточка удалена' })
+        .catch(() => {
+          res.status(400).send({ message: 'некорректный id карточки.' });
+        });
     });
 };
 
@@ -45,14 +49,13 @@ const putLike = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
     // eslint-disable-next-line consistent-return
     .then((card) => {
-      console.log(card);
       if (!card) {
-        return res.status(404).send({ message: 'пользователь не найден.' });
+        return res.status(404).send({ message: 'некорректный id карточки.' });
       }
       res.status(200).send({ message: card });
     })
     .catch(() => {
-      res.status(400).send({ message: 'некорректный id карточки' });
+      res.status(400).send({ message: 'некорректный id карточки.' });
     });
 };
 
@@ -60,8 +63,7 @@ const deleteLike = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } })
     // eslint-disable-next-line consistent-return
     .then((card) => {
-      console.log(card);
-      if (!req.params.cardId) {
+      if (!card) {
         return res.status(400).send({ message: 'некорректный id карточки' });
       }
       res.status(200).send({ message: card });
