@@ -44,11 +44,8 @@ const deleteCard = (req, res) => {
           if (err.name === 'ValidationError') {
             return res.status(400).send({ message: 'Переданы некорректные данные при удалении карточки' });
           }
-          res.status(400).send({ message: 'некорректный id карточки.' });
+          res.status(500).send({ message: 'некорректный id карточки.' });
         });
-    })
-    .catch((err) => {
-      res.status(400).send({ message: err.message });
     });
 };
 
@@ -61,8 +58,12 @@ const putLike = (req, res) => {
       }
       res.status(200).send({ message: card });
     })
-    .catch(() => {
-      res.status(400).send({ message: 'некорректный id карточки.' });
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Переданы некорректные данные' });
+      } else {
+        res.status(500).send({ message: 'Ошибка сервера' });
+      }
     });
 };
 
@@ -76,8 +77,12 @@ const deleteLike = (req, res) => {
       res.status(200).send({ message: card });
     })
     // eslint-disable-next-line consistent-return
-    .catch(() => {
-      res.status(400).send({ message: 'некорректный id карточки' });
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Переданы некорректные данные' });
+      } else {
+        res.status(500).send({ message: 'Ошибка сервера' });
+      }
     });
 };
 

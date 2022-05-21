@@ -50,16 +50,14 @@ const getUsers = (req, res) => {
 // eslint-disable-next-line consistent-return
 const updateProfile = (req, res) => {
   const { name, about } = req.body;
-  if (!name || !about) {
-    return res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
-  }
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
-      if (err.kind === 'ObjectId') {
-        return res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Переданы некорректные данные' });
+      } else {
+        res.status(500).send({ message: 'Ошибка сервера' });
       }
-      return res.status(500).send({ message: 'Server error' });
     });
 };
 
