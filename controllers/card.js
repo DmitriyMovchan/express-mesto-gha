@@ -32,20 +32,21 @@ const createCard = (req, res) => {
 };
 
 const deleteCard = (req, res) => {
-  Card.findByIdAndDelete(req.params.cardId)
+  Card.findByIdAndRemove(req.params.cardId)
     // eslint-disable-next-line consistent-return
     .then((card) => {
       if (!card) {
-        return res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
+        res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
+        return;
       }
-      res.send({ message: 'Карточка удалена' })
-        // eslint-disable-next-line consistent-return
-        .catch((err) => {
-          if (err.name === 'ValidationError') {
-            return res.status(400).send({ message: 'Переданы некорректные данные при удалении карточки' });
-          }
-          res.status(500).send({ message: 'некорректный id карточки.' });
-        });
+      res.send({ message: 'Карточка удалена' });
+    })
+  // eslint-disable-next-line consistent-return
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(400).send({ message: 'Переданы некорректные данные при удалении карточки' });
+      }
+      res.status(500).send({ message: 'некорректный id карточки.' });
     });
 };
 
@@ -59,7 +60,7 @@ const putLike = (req, res) => {
       res.status(200).send({ message: card });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         res.status(400).send({ message: 'Переданы некорректные данные' });
       } else {
         res.status(500).send({ message: 'Ошибка сервера' });
@@ -78,7 +79,7 @@ const deleteLike = (req, res) => {
     })
     // eslint-disable-next-line consistent-return
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         res.status(400).send({ message: 'Переданы некорректные данные' });
       } else {
         res.status(500).send({ message: 'Ошибка сервера' });
