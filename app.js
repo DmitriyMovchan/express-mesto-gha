@@ -14,12 +14,15 @@ app.use((req, _, next) => {
   };
   next();
 });
+
+app.post('/signin', userRouter);
+app.post('/signup', userRouter);
 app.use('/', userRouter);
 app.use('/cards', cardRouter);
-
 app.use('*', (req, res) => res.status(404).send({ message: 'Запрашиваемая страница не найдена' }));
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.listen(PORT, () => {
+  console.log(PORT);
 });

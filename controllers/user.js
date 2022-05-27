@@ -1,4 +1,8 @@
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
+
+const MONGO_DUPLICATE_KEY_CODE = 11000;
+const saltRounds = 10;
 
 const getUser = (req, res) => {
   const { id } = req.params;
@@ -19,22 +23,53 @@ const getUser = (req, res) => {
 };
 
 // eslint-disable-next-line consistent-return
+// const createUser = (req, res) => {
+//   const { name, about, avatar } = req.body;
+//   if (!name || !about || !avatar) {
+//     return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+//   }
+//   User.create({ name, about, avatar })
+//     .then((user) => {
+//       res.status(201).send({ message: user });
+//     })
+//     // eslint-disable-next-line consistent-return
+//     .catch((err) => {
+//       if (err.name === 'ValidationError') {
+//         return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+//       }
+//       res.status(500).send({ message: 'Server error' });
+//     });
+// };
+
+// eslint-disable-next-line consistent-return
 const createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  if (!name || !about || !avatar) {
+  const {
+    name, about, avatar, password, email,
+  } = req.body;
+  if (!password || !email) {
     return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
   }
-  User.create({ name, about, avatar })
-    .then((user) => {
-      res.status(201).send({ message: user });
+  bcrypt.hash(password, saltRounds)
+    .then((hash) => {
+      User.create({
+        name, about, avatar, email, password: hash,
+      })
+        .then((user) => {
+          res.status(201).send({ message: user });
+        });
     })
     // eslint-disable-next-line consistent-return
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      console.log('err', err);
+      if (err.code === MONGO_DUPLICATE_KEY_CODE) {
         return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
       }
-      res.status(500).send({ message: 'Server error' });
+      res.status(500).send({ message: err.name });
     });
+};
+
+const login = (req, res) => {
+
 };
 
 const getUsers = (req, res) => {
@@ -83,6 +118,7 @@ module.exports = {
   getUsers,
   updateProfile,
   updateAvatar,
+  login,
 };
 
 // 6285ffb56466a33763982e46 - id тестового пользователя
