@@ -1,14 +1,15 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
-const { generateToken, verifyToken } = require('../middlewares/auth');
+const { generateToken } = require('../middlewares/auth');
 
 const MONGO_DUPLICATE_KEY_CODE = 11000;
 const saltRounds = 10;
 
 // eslint-disable-next-line consistent-return
 const getUser = (req, res) => {
-  return User.find({ id: req.params.id })
+  return User.findOne({ id: req.params.id })
     .then((user) => {
+      console.log({ id: req.body });
       if (!user) {
         return res.status(404).send({ message: 'Нет пользователя с таким id' });
       }
@@ -44,7 +45,7 @@ const createUser = (req, res) => {
 
 const login = (req, res) => {
   const { email, password } = req.body;
-  User.findOne({ email })
+  User.findOne({ email }).select('+password')
   // eslint-disable-next-line consistent-return
     .then((user) => {
       if (!user) {
@@ -116,6 +117,19 @@ const updateAvatar = (req, res) => {
     });
 };
 
+const getMe = (req, res) => {
+  const { _id } = req.user;
+  return User.findById(_id)
+    .then((user) => {
+      console.log({ user });
+      if (!user) {
+        return res.status(404).send({ message: 'Нет пользователя с таким id' });
+      }
+      return res.status(200).send(user);
+    })
+    .catch((err) => res.status(500).send(err));
+};
+
 module.exports = {
   getUser,
   createUser,
@@ -123,6 +137,7 @@ module.exports = {
   updateProfile,
   updateAvatar,
   login,
+  getMe,
 };
 
 // 6285ffb56466a33763982e46 - id тестового пользователя

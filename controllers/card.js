@@ -32,14 +32,22 @@ const createCard = (req, res) => {
 };
 
 const deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findById(req.params.cardId)
     // eslint-disable-next-line consistent-return
     .then((card) => {
       if (!card) {
         res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
         return;
       }
-      res.send({ message: 'Карточка удалена' });
+      console.log(card.owner._id.toString() === req.user._id);
+      if (card.owner._id.toString() === req.user._id) {
+        Card.deleteOne(card)
+          .then(() => {
+            res.send({ message: 'Карточка удалена1' });
+          });
+      } else {
+        res.status(401).send({ message: 'Чужие карточки удалять нельзя' });
+      }
     })
   // eslint-disable-next-line consistent-return
     .catch((err) => {
