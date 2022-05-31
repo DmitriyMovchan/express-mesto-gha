@@ -1,45 +1,21 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
+const { generateToken, verifyToken } = require('../middlewares/auth');
 
 const MONGO_DUPLICATE_KEY_CODE = 11000;
 const saltRounds = 10;
 
+// eslint-disable-next-line consistent-return
 const getUser = (req, res) => {
-  const { id } = req.params;
-  User.findById(id)
-    // eslint-disable-next-line consistent-return
+  return User.find({ id: req.params.id })
     .then((user) => {
       if (!user) {
-        return res.status(404).send({ message: 'пользователь не найден.' });
+        return res.status(404).send({ message: 'Нет пользователя с таким id' });
       }
-      res.status(200).send({ message: user });
+      return res.status(200).send(user);
     })
-    .catch((err) => {
-      if (err.kind === 'ObjectId') {
-        return res.status(400).send({ message: 'Пользователь по указанному _id не найден.' });
-      }
-      return res.status(500).send({ message: 'Server error' });
-    });
+    .catch((err) => res.status(500).send(err));
 };
-
-// eslint-disable-next-line consistent-return
-// const createUser = (req, res) => {
-//   const { name, about, avatar } = req.body;
-//   if (!name || !about || !avatar) {
-//     return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-//   }
-//   User.create({ name, about, avatar })
-//     .then((user) => {
-//       res.status(201).send({ message: user });
-//     })
-//     // eslint-disable-next-line consistent-return
-//     .catch((err) => {
-//       if (err.name === 'ValidationError') {
-//         return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-//       }
-//       res.status(500).send({ message: 'Server error' });
-//     });
-// };
 
 // eslint-disable-next-line consistent-return
 const createUser = (req, res) => {
@@ -50,26 +26,54 @@ const createUser = (req, res) => {
     return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
   }
   bcrypt.hash(password, saltRounds)
-    .then((hash) => {
-      User.create({
-        name, about, avatar, email, password: hash,
-      })
-        .then((user) => {
-          res.status(201).send({ message: user });
-        });
+    .then((hash) => User.create({
+      name, about, avatar, email, password: hash,
     })
+      .then((user) => {
+        res.status(201).send({ message: user });
+      }))
     // eslint-disable-next-line consistent-return
     .catch((err) => {
       console.log('err', err);
       if (err.code === MONGO_DUPLICATE_KEY_CODE) {
-        return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+        return res.status(400).send({ message: 'Пользователь с таким емейлом уже есть.' });
       }
       res.status(500).send({ message: err.name });
     });
 };
 
 const login = (req, res) => {
-
+  const { email, password } = req.body;
+  User.findOne({ email })
+  // eslint-disable-next-line consistent-return
+    .then((user) => {
+      if (!user) {
+        // return Promise.reject(new Error('Неправильные почта или пароль'));
+        throw new Error('not found');
+        // return res.status(400).send({ message: 'Email или пароль не верный' });
+      }
+      return {
+        isPasswordValid: bcrypt.compare(password, user.password),
+        user,
+      };
+    })
+    // eslint-disable-next-line consistent-return
+    .then(({ isPasswordValid, user }) => {
+      if (!isPasswordValid) {
+        return res.status(400).send({ message: 'Email или пароль не верный' });
+      }
+      return generateToken({ _id: user._id });
+    })
+    .then((token) => {
+      res.status(200).send({ token });
+    })
+    // eslint-disable-next-line consistent-return
+    .catch((err) => {
+      if (err.message === 'not found') {
+        return res.status(400).send({ message: 'Email или пароль не верный!!!' });
+      }
+      return res.status(500).send({ message: 'что-то поломалось' });
+    });
 };
 
 const getUsers = (req, res) => {

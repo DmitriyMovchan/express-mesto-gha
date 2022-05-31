@@ -7,13 +7,14 @@ const {
   updateAvatar,
   login,
 } = require('../controllers/user');
+const { isAuthorized } = require('../middlewares/auth');
 
 router.post('/signup', createUser);
-router.get('/users/:id', getUser);
 router.patch('/users/me', updateProfile);
 router.post('/users', createUser);
 router.get('/users', getUsers);
 router.patch('/users/me/avatar', updateAvatar);
-router.post('/', login);
+router.post('/signin', login);
+router.get('/users/:id', isAuthorized, getUser);
 
 module.exports.userRouter = router;
