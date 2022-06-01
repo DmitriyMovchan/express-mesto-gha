@@ -43,8 +43,12 @@ const createUser = (req, res) => {
     });
 };
 
+// eslint-disable-next-line consistent-return
 const login = (req, res) => {
   const { email, password } = req.body;
+  if (!password || !email) {
+    return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+  }
   User.findOne({ email }).select('+password')
   // eslint-disable-next-line consistent-return
     .then((user) => {

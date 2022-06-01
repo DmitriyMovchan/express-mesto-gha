@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const { userRouter } = require('./routes/user');
 const { cardRouter } = require('./routes/card');
 const { isAuthorized } = require('./middlewares/auth');
+const res = require('express/lib/response');
 
 const app = express();
 
@@ -16,6 +17,11 @@ app.use(isAuthorized);
 app.use('/', userRouter);
 app.use('/cards', cardRouter);
 app.use('*', (req, res) => res.status(404).send({ message: 'Запрашиваемая страница не найдена' }));
+
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send();
+});
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
