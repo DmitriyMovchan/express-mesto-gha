@@ -43,7 +43,7 @@ router.patch('/users/me/avatar', celebrate({
 router.get('/users/me', isAuthorized, getMe);
 router.get('/users/:id', celebrate({
   params: Joi.object().keys({
-    userId: Joi.string().length(24).hex(),
+    id: Joi.string().length(24).hex(),
   }),
 }), isAuthorized, getUser);
 

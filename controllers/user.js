@@ -14,6 +14,7 @@ const saltRounds = 10;
 
 const getUser = (req, res, next) => {
   const { id } = req.params;
+  console.log(id);
   User.findById(id)
     // eslint-disable-next-line consistent-return
     .then((user) => {
@@ -21,6 +22,7 @@ const getUser = (req, res, next) => {
         throw new NotFoundError('Нет пользователя с таким id');
         // return res.status(404).send({ message: 'пользователь не найден.' });
       }
+      console.log(user);
       res.status(200).send(user);
     })
     .catch((err) => {
@@ -47,7 +49,6 @@ const createUser = (req, res, next) => {
       name, about, avatar, email, password: hash,
     })
       .then((user) => {
-        console.log(user);
         // eslint-disable-next-line no-shadow
         const {
           // eslint-disable-next-line no-shadow
