@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const { celebrate, Joi } = require('celebrate');
 const {
   getUser,
   createUser,
@@ -10,13 +11,35 @@ const {
 } = require('../controllers/user');
 const { isAuthorized } = require('../middlewares/auth');
 
-router.post('/signup', createUser);
+router.post('/signup', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    // eslint-disable-next-line no-undef
+    avatar: Joi.string().required().pattern(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/),
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+  }),
+}), createUser);
 router.post('/signin', login);
-router.patch('/users/me', updateProfile);
+router.patch('/users/me', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+  }),
+}), updateProfile);
 router.post('/users', createUser);
 router.get('/users', getUsers);
-router.patch('/users/me/avatar', updateAvatar);
+router.patch('/users/me/avatar', celebrate({
+  body: Joi.object().keys({
+    avatar: Joi.string().required().pattern(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/),
+  }),
+}), updateAvatar);
 router.get('/users/me', isAuthorized, getMe);
-router.get('/users/:id', isAuthorized, getUser);
+router.get('/users/:id', celebrate({
+  params: Joi.object().keys({
+    userId: Joi.string().length(24).hex(),
+  }),
+}), isAuthorized, getUser);
 
 module.exports.userRouter = router;
