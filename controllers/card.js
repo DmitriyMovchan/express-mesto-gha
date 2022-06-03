@@ -3,9 +3,7 @@ const Card = require('../models/card');
 const {
   NotFoundError,
   BadRequest,
-  UnauthorizedError,
   Forbidden,
-  ConflictError,
 } = require('../errors/errors');
 
 const getCards = (req, res, next) => {
@@ -74,7 +72,6 @@ const deleteCard = (req, res, next) => {
 };
 
 const putLike = (req, res, next) => {
-  console.log(req.params.cardId);
   Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
     // eslint-disable-next-line consistent-return
     .then((card) => {
