@@ -55,10 +55,10 @@ const deleteCard = (req, res, next) => {
       if (card.owner._id.toString() === req.user._id) {
         Card.deleteOne(card)
           .then(() => {
-            res.send({ message: 'Карточка удалена1' });
+            res.status(200).send({ message: 'Карточка удалена1' });
           });
       } else {
-        next(new Forbidden('Вы пытались удалить чужую карточку'));
+        return next(new Forbidden('Вы пытались удалить чужую карточку'));
         // res.status(403).send({ message: 'Чужие карточки удалять нельзя' });
       }
     })
