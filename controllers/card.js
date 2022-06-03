@@ -100,7 +100,7 @@ const deleteLike = (req, res, next) => {
     // eslint-disable-next-line consistent-return
     .then((card) => {
       if (!card) {
-        next(new NotFoundError('Переданы некорректные данные'));
+        throw new NotFoundError('Переданы некорректные данные');
         // return res.status(404).send({ message: 'некорректный id карточки' });
       }
       res.status(200).send({ message: card });
