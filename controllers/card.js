@@ -1,10 +1,8 @@
 const Card = require('../models/card');
 
-const {
-  NotFoundError,
-  BadRequest,
-  Forbidden,
-} = require('../errors/errors');
+const { NotFoundError } = require('../errors/NotFoundError');
+const { BadRequest } = require('../errors/BadRequest');
+const { Forbidden } = require('../errors/Forbidden');
 
 const getCards = (req, res, next) => {
   Card.find({})

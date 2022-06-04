@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { isEmail } = require('validator');
 const bcrypt = require('bcryptjs');
-const { UnauthorizedError } = require('../errors/errors');
+const { UnauthorizedError } = require('../errors/UnauthorizedError');
 
 const avatarReg = /^https?:\/\/(www\.)?[a-zA-Z\d-]+\.[\w\d\-.~:/?#[\]@!$&'()*+,;=]{2,}#?$/;
 

@@ -4,7 +4,7 @@ const { errors } = require('celebrate');
 const { userRouter } = require('./routes/user');
 const { cardRouter } = require('./routes/card');
 const { isAuthorized } = require('./middlewares/auth');
-const { NotFoundError } = require('./errors/errors');
+const { NotFoundError } = require('./errors/NotFoundError');
 
 const app = express();
 

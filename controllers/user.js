@@ -1,18 +1,15 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const { generateToken } = require('../middlewares/auth');
-const {
-  NotFoundError,
-  BadRequest,
-  ConflictError,
-} = require('../errors/errors');
+const { NotFoundError } = require('../errors/NotFoundError');
+const { BadRequest } = require('../errors/BadRequest');
+const { ConflictError } = require('../errors/ConflictError');
 
 const MONGO_DUPLICATE_KEY_CODE = 11000;
 const saltRounds = 10;
 
 const getUser = (req, res, next) => {
   const { id } = req.params;
-  console.log(id);
   User.findById(id)
     // eslint-disable-next-line consistent-return
     .then((user) => {
