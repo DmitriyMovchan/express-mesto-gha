@@ -4,6 +4,7 @@ const { errors } = require('celebrate');
 const { userRouter } = require('./routes/user');
 const { cardRouter } = require('./routes/card');
 const { isAuthorized } = require('./middlewares/auth');
+const { NotFoundError } = require('./errors/errors');
 
 const app = express();
 
@@ -17,8 +18,7 @@ app.use(isAuthorized);
 app.use('/', userRouter);
 app.use('/cards', cardRouter);
 // eslint-disable-next-line no-shadow
-app.use('*', (req, res) => res.status(404).send({ message: 'Запрашиваемая страница не найдена' }));
-
+app.use('*', (req, res, next) => next(new NotFoundError('Запрашиваемая страница не найдена')));
 app.use(errors());
 
 // eslint-disable-next-line no-unused-vars

@@ -20,10 +20,6 @@ const getCards = (req, res, next) => {
 // eslint-disable-next-line consistent-return
 const createCard = (req, res, next) => {
   const { name, link } = req.body;
-  if (!name || !link) {
-    throw new BadRequest('Неправильный запрос');
-    // return res.status(400).send({ message: 'Переданы некорректные данные' });
-  }
   const owner = req.user._id;
 
   Card.create({ name, link, owner })
@@ -33,7 +29,7 @@ const createCard = (req, res, next) => {
     // eslint-disable-next-line consistent-return
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequest('Неправильный запрос'));
+        return next(new BadRequest('Неправильный запрос'));
         // return res.status(400).send({ message: 'Переданы некорректные данные' });
       }
       next(err);
@@ -63,7 +59,7 @@ const deleteCard = (req, res, next) => {
   // eslint-disable-next-line consistent-return
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequest('Неправильный запрос'));
+        return next(new BadRequest('Неправильный запрос'));
         // return res.status(400).send({ message: 'Переданы некорректные данные' });
       }
       next(err);

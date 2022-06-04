@@ -4,8 +4,6 @@ const { generateToken } = require('../middlewares/auth');
 const {
   NotFoundError,
   BadRequest,
-  UnauthorizedError,
-  Forbidden,
   ConflictError,
 } = require('../errors/errors');
 
@@ -25,9 +23,10 @@ const getUser = (req, res, next) => {
       console.log(user);
       res.status(200).send(user);
     })
+    // eslint-disable-next-line consistent-return
     .catch((err) => {
       if (err.kind === 'ObjectId') {
-        next(new BadRequest('Неправильный запрос'));
+        return next(new BadRequest('Неправильный запрос'));
         // return res.status(400).send({ message: 'Пользователь по указанному _id не найден.' });
       }
       next(err);
@@ -61,7 +60,7 @@ const createUser = (req, res, next) => {
     // eslint-disable-next-line consistent-return
     .catch((err) => {
       if (err.code === MONGO_DUPLICATE_KEY_CODE) {
-        next(new ConflictError('Пользователь с таким емейлом уже есть.'));
+        return next(new ConflictError('Пользователь с таким емейлом уже есть.'));
         // return res.status(409).send({ message: 'Пользователь с таким емейлом уже есть.' });
       }
       next(err);
@@ -100,7 +99,7 @@ const updateProfile = (req, res, next) => {
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new NotFoundError('Переданы некорректные данные'));
+        next(new BadRequest('Переданы некорректные данные'));
       } else {
         next(err);
       }
@@ -116,9 +115,10 @@ const updateAvatar = (req, res, next) => {
   }
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .then((user) => res.status(200).send({ data: user }))
+    // eslint-disable-next-line consistent-return
     .catch((err) => {
       if (err.kind === 'ObjectId') {
-        next(new NotFoundError('Переданы некорректные данные'));
+        return next(new BadRequest('Переданы некорректные данные'));
         // return res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
       }
       next(err);
@@ -151,21 +151,3 @@ module.exports = {
   login,
   getMe,
 };
-
-// 6285ffb56466a33763982e46 - id тестового пользователя
-
-// eslint-disable-next-line consistent-return
-// eslint-disable-next-line consistent-return
-// const getUserById = (req, res) => {
-//   return User.findById(req.user._id)
-//     .then((user) => {
-//       console.log({ id: req.params });
-//       if (!user) {
-//         console.log('user', user)
-//         return res.status(404).send({ message: 'Нет пользователя с таким id' });
-//       }
-//       console.log('user', req.params.id)
-//       return res.status(200).send(user);
-//     })
-//     .catch((err) => res.status(500).send(err));
-// };
